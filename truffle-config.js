@@ -1,14 +1,9 @@
 const HDWalletProvider = require('@truffle/hdwallet-provider');
-const dotenv = require('dotenv');
-dotenv.config();
-
 const mnemonic = process.env.MNEMONIC;
 const infuraKey = process.env.INFURA_KEY;
-const account_1 = process.env.ACCOUNT_1;
-
 
 module.exports = {
-	plugins: [
+  plugins: [
     'truffle-contract-size'
   ],
 
@@ -26,10 +21,10 @@ module.exports = {
       host: "127.0.0.1",     // Localhost (default: none)
       port: 7545,            // Standard Ethereum port (default: none)
       network_id: "5777",       // Any network (default: none),
-      from: '0x4Df194648722B50E7e2a0f39fBeA0d756bB83E44'
+      from: '0x1191bcd21C66E37BC9d3a5545678717bDCa394EA'
      },
      ropsten: {
-      provider: () => new HDWalletProvider(mnemonic, infuraKey, 0),
+      provider: () => new HDWalletProvider(mnemonic, `https://ropsten.infura.io/v3/${infuraKey}`, 0),
       network_id: 3,
       gas: 8000000,
       gasPrice: 18000000000,

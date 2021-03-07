@@ -1,19 +1,51 @@
 const { deployProxy } = require('@openzeppelin/truffle-upgrades');
-
+// handle migrations
 const PaidToken = artifacts.require("PaidToken");
+const PaidTokenV2 = artifacts.require("PaidTokenV2");
+const PaidTokenV3 = artifacts.require("PaidTokenV3");
+//Allocation Accounts
+const allocation1 = process.env.ALLOCATION_1
+const allocation2 = process.env.ALLOCATION_2
+const allocation3 = process.env.ALLOCATION_3
+const allocation4 = process.env.ALLOCATION_4
+const allocation5 = process.env.ALLOCATION_5
+const allocation6 = process.env.ALLOCATION_6
+const allocation7 = process.env.ALLOCATION_7
+const allocation8 = process.env.ALLOCATION_8
+//Initial Mint Account
+const account1 = process.env.ACCOUNT_1
+const account2 = process.env.ACCOUNT_2
+const account3 = process.env.ACCOUNT_3
 
 module.exports = async function (deployer) {
-  const instance = await deployProxy(PaidToken, [], { deployer });
+	// @TODO: The three types of migrations to be carried out are placed, two in testnet,
+	// to test the complete deployment and update cycle, and then only one in mainnet,
+	// since it is the one that will be carried out definitively
+
+	// Testnet Approach Stage #1
+	// const instance = await deployProxy(PaidToken, [], { deployer });
+
+	// Testnet Approach Stage #2
+	// const existing = await PaidTokenV.deployed();
+  // const instance = await upgradeProxy(existing.address, PaidTokenV2,[account1, account2, account3] ,{ deployer });
+
+	// Testnet Approach Stage #3
+	// const existing = await PaidTokenV2.deployed();
+	// const instance = await upgradeProxy(existing.address, PaidTokenV3,[account1, account2, account3] ,{ deployer });
+
+	// Mainnet Approach Stage #4
+	const existing = await PaidTokenV2.deployed();
+	const instance = await upgradeProxy(existing.address, PaidTokenV3,[account1, account2, account3] ,{ deployer });
 
   const wallets = [
-    '0x67F5B9e57EaE4f5f32E98BB7D7D1fb8F90AcFb45',
-    '0xeB747e306FBb7Bb9617043F9e4d62cEFC1dc8c1C',
-    '0xe7B9e79A316E32491D7FF842926FdEd1C62Ef92E',
-    '0xBa6A6fe967175Bb996fB4fF8A248e2478c1A0c95',
-    '0xC7E130b45d3739314fFE83578c645B5296EDE6E3',
-    '0x230E8F9aB9EB0935D2570Cfad195E55801fD845B',
-    '0x188a6a740bede0735Fa4fB41fF5E977274DD6eD0',
-    '0x2c0a336bE063CC68Efc7f9C58a79272C1E61bC3f'
+    allocation1,
+    allocation2,
+    allocation3,
+    allocation4,
+    allocation5,
+    allocation6,
+    allocation7,
+    allocation8
   ]
 
   for (const i in wallets) {
