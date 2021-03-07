@@ -26,7 +26,7 @@ struct VestingType {
 }
 
 contract PaidTokenV3 is Initializable, OwnableUpgradeable, ERC20PausableUpgradeable {
-	mapping (address => uint256) private _balances;
+    mapping (address => uint256) private _balances;
     mapping (address => FrozenWallet) public frozenWallets;
     VestingType[] public vestingTypes;
 
@@ -151,10 +151,12 @@ contract PaidTokenV3 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
 
         return transferableAmount;
     }
-	function transferMany(address[] calldata recipients, uint256[] calldata amounts)
-        external
-		onlyOwner
-		returns (bool) {
+
+
+    function transferMany(address[] calldata recipients, uint256[] calldata amounts)
+    external
+	onlyOwner
+	returns (bool) {
         require(recipients.length == amounts.length, "PAID Token: Wrong array length");
 
         uint256 total = 0;
@@ -162,7 +164,7 @@ contract PaidTokenV3 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
             total = total.add(amounts[i]);
         }
 
-		_balances[msg.sender] = _balances[msg.sender].sub(total, "ERC20: transfer amount exceeds balance");
+	_balances[msg.sender] = _balances[msg.sender].sub(total, "ERC20: transfer amount exceeds balance");
 
         for (uint256 i = 0; i < recipients.length; i++) {
             address recipient = recipients[i];
