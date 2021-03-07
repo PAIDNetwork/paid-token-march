@@ -18,24 +18,24 @@ const account2 = process.env.ACCOUNT_2
 const account3 = process.env.ACCOUNT_3
 
 module.exports = async function (deployer) {
-	// @TODO: The three types of migrations to be carried out are placed, two in testnet,
-	// to test the complete deployment and update cycle, and then only one in mainnet,
-	// since it is the one that will be carried out definitively
+// @TODO: The three types of migrations to be carried out are placed, two in testnet,
+// to test the complete deployment and update cycle, and then only one in mainnet,
+// since it is the one that will be carried out definitively
 
-	// Testnet Approach Stage #1
-	// const instance = await deployProxy(PaidToken, [], { deployer });
+// Testnet Approach Stage #1
+// const instance = await deployProxy(PaidToken, [], { deployer });
 
-	// Testnet Approach Stage #2
-	// const existing = await PaidTokenV.deployed();
-  // const instance = await upgradeProxy(existing.address, PaidTokenV2,[account1, account2, account3] ,{ deployer });
+// Testnet Approach Stage #2
+// const existing = await PaidTokenV.deployed();
+ // const instance = await upgradeProxy(existing.address, PaidTokenV2,[account1, account2, account3] ,{ deployer });
 
-	// Testnet Approach Stage #3
-	// const existing = await PaidTokenV2.deployed();
-	// const instance = await upgradeProxy(existing.address, PaidTokenV3,[account1, account2, account3] ,{ deployer });
+// Testnet Approach Stage #3
+// const existing = await PaidTokenV2.deployed();
+// const instance = await upgradeProxy(existing.address, PaidTokenV3,[account1, account2, account3] ,{ deployer });
 
-	// Mainnet Approach Stage #4
-	const existing = await PaidTokenV2.deployed();
-	const instance = await upgradeProxy(existing.address, PaidTokenV3,[account1, account2, account3] ,{ deployer });
+  // Mainnet Approach Stage #4
+  const existing = await PaidTokenV2.deployed();
+  const instance = await upgradeProxy(existing.address, PaidTokenV3,[account1, account2, account3] ,{ deployer });
 
   const wallets = [
     allocation1,
