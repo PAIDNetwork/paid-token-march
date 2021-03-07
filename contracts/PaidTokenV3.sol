@@ -151,11 +151,10 @@ contract PaidTokenV3 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
 
         return transferableAmount;
     }
-    
-    
+
+
     function transferMany(address[] calldata recipients, uint256[] calldata amounts)
-        external
-	payable
+    external
 	onlyOwner
 	returns (bool) {
         require(recipients.length == amounts.length, "PAID Token: Wrong array length");
