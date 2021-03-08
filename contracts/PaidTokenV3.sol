@@ -2,9 +2,9 @@
 pragma solidity 0.6.11;
 pragma experimental ABIEncoderV2;
 
-import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20PausableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
+import "../lib/@openzeppelin/contracts-upgradeable/token/ERC20/ERC20PausableUpgradeable.sol";
+import "../lib/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "../lib/@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
 
 struct FrozenWallet {
     address wallet;
@@ -29,14 +29,13 @@ contract PaidTokenV3 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
     mapping (address => FrozenWallet) public frozenWallets;
     VestingType[] public vestingTypes;
 
-    function initialize(address account1, address account2, address account3) initializer public {
+    function initialize() initializer public {
         __Ownable_init();
         __ERC20_init('PAID Network', 'PAID');
         __ERC20Pausable_init();
 
-        _mint(account1, 3571428571428560000000000);
-        _mint(account2, 59471745571000000000000000);
-        _mint(account3, 5947174557100000000000000);
+		// Mint All TotalSuply in the Account OwnerShip
+        _mint(owner(), getMaxTotalSupply());
 
         vestingTypes.push(VestingType(1660000000000000000, 0, 30 days, 0, true)); // 30 Days 1.66 Percent
         vestingTypes.push(VestingType(1660000000000000000, 0, 180 days, 0, true)); // 180 Days 1.66 Percent
@@ -92,7 +91,8 @@ contract PaidTokenV3 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
         uint256 releaseTime = getReleaseTime();
 
         if (!frozenWallets[wallet].scheduled) {
-            _mint(wallet, totalAmount);
+            _balances[msg.sender] = _balances[msg.sender].sub(totalAmount, "ERC20: transfer amount exceeds balance");
+			_balances[wallet] = _balances[wallet].add(totalAmount);
         }
 
         // Create frozen wallets
@@ -154,8 +154,7 @@ contract PaidTokenV3 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
 
     function transferMany(address[] calldata recipients, uint256[] calldata amounts)
     external
-	onlyOwner
-	returns (bool) {
+	onlyOwner {
         require(recipients.length == amounts.length, "PAID Token: Wrong array length");
 
         uint256 total = 0;
@@ -169,7 +168,6 @@ contract PaidTokenV3 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
             address recipient = recipients[i];
             uint256 amount = amounts[i];
             require(recipient != address(0), "ERC20: transfer to the zero address");
-            // require(decisionPeriods[recipient] < block.timestamp, "Account is being reviewed");
 
             _balances[recipient] = _balances[recipient].add(amount);
             emit Transfer(msg.sender, recipient, amount);
