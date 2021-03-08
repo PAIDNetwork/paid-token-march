@@ -1,0 +1,9 @@
+# Folder
+node_modules/
+build/
+.openzeppelin/
+.openzeppelin/
+# Files
+.DS_Store
+.env
+
