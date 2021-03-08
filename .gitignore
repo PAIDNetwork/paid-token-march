@@ -1,6 +1,8 @@
+# Folder
 node_modules/
 build/
 .openzeppelin/
+.openzeppelin/.session
+# Files
 .DS_Store
 .env
-.openzeppelin/.session
