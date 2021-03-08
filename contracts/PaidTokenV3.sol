@@ -91,8 +91,7 @@ contract PaidTokenV3 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
         uint256 releaseTime = getReleaseTime();
 
         if (!frozenWallets[wallet].scheduled) {
-            _balances[msg.sender] = _balances[msg.sender].sub(totalAmount, "ERC20: transfer amount exceeds balance");
-	    _balances[wallet] = _balances[wallet].add(totalAmount);
+            super._transfer(msg.sender, wallet, totalAmount);
         }
 
         // Create frozen wallets
