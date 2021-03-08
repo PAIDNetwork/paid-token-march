@@ -41,21 +41,21 @@ const instance = await deployProxy(PaidTokenV3, [], { deployer });
   // Mainnet Approach Stage #2
   // const instance = await deployProxy(PaidTokenV3, [account1, account2, account3], { deployer });
 
-  const wallets = [
-    allocation1,
-    allocation2,
-    allocation3,
-    allocation4,
-    allocation5,
-    allocation6,
-    allocation7,
-    allocation8
-  ]
+  // const wallets = [
+  //   allocation1,
+  //   allocation2,
+  //   allocation3,
+  //   allocation4,
+  //   allocation5,
+  //   allocation6,
+  //   allocation7,
+  //   allocation8
+  // ]
 
-  for (const i in wallets) {
-		console.log(wallets[i]);
-    await instance.addAllocations([wallets[i]], ['1000000000000000000000000'], i.toString());
-  }
+  // for (const i in wallets) {
+	// 	console.log(wallets[i]);
+  //   await instance.addAllocations([wallets[i]], ['1000000000000000000000000'], i.toString());
+  // }
 
   // await instance.addAllocations(['allocation1'], ['amount1'], '0'); // 30 Days 1.66 Percent
   // await instance.addAllocations(['allocation2'], ['amount2'], '1'); // 180 Days 1.66 Percent
