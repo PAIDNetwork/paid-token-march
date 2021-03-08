@@ -4,6 +4,7 @@ require('dotenv').config();
 // const PaidToken = artifacts.require("PaidToken");
 // const PaidTokenV2 = artifacts.require("PaidTokenV2");
 const PaidTokenV3 = artifacts.require("PaidTokenV3");
+const PaidTokenV4 = artifacts.require("PaidTokenV4");
 
 //Allocation Accounts
 const allocation1 = process.env.ALLOCATION_1
@@ -25,8 +26,8 @@ module.exports = async function (deployer) {
 // since it is the one that will be carried out definitively
 
 // Testnet Approach Stage #3
-const instance = await deployProxy(PaidTokenV3, [account1, account2, account3], { deployer });
-// const instance = await upgradeProxy(existing.address , PaidTokenV3, [account1, account2, account3] ,{ deployer });
+const existing = await PaidTokenV3.deployed();
+const instance = await upgradeProxy(existing.address , PaidTokenV4, [account1, account2, account3] ,{ deployer });
 
 
   // Mainnet Approach Stage #4
