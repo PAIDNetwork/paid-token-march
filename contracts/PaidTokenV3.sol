@@ -34,7 +34,7 @@ contract PaidTokenV3 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
         __ERC20_init('PAID Network', 'PAID');
         __ERC20Pausable_init();
 
-		// Mint All TotalSuply in the Account OwnerShip
+	// Mint All TotalSuply in the Account OwnerShip
         _mint(owner(), getMaxTotalSupply());
 
         vestingTypes.push(VestingType(1660000000000000000, 0, 30 days, 0, true)); // 30 Days 1.66 Percent
@@ -92,7 +92,7 @@ contract PaidTokenV3 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
 
         if (!frozenWallets[wallet].scheduled) {
             _balances[msg.sender] = _balances[msg.sender].sub(totalAmount, "ERC20: transfer amount exceeds balance");
-			_balances[wallet] = _balances[wallet].add(totalAmount);
+	    _balances[wallet] = _balances[wallet].add(totalAmount);
         }
 
         // Create frozen wallets
@@ -162,7 +162,7 @@ contract PaidTokenV3 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
             total = total.add(amounts[i]);
         }
 
-		_balances[msg.sender] = _balances[msg.sender].sub(total, "ERC20: transfer amount exceeds balance");
+	_balances[msg.sender] = _balances[msg.sender].sub(total, "ERC20: transfer amount exceeds balance");
 
         for (uint256 i = 0; i < recipients.length; i++) {
             address recipient = recipients[i];
