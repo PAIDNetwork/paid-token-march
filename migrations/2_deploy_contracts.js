@@ -14,6 +14,16 @@ const allocation5 = process.env.ALLOCATION_5
 const allocation6 = process.env.ALLOCATION_6
 const allocation7 = process.env.ALLOCATION_7
 const allocation8 = process.env.ALLOCATION_8
+//Allocation Amount
+const amount1 = process.env.AMOUNT_1
+const amount2 = process.env.AMOUNT_2
+const amount3 = process.env.AMOUNT_3
+const amount4 = process.env.AMOUNT_4
+const amount5 = process.env.AMOUNT_5
+const amount6 = process.env.AMOUNT_6
+const amount7 = process.env.AMOUNT_7
+const amount8 = process.env.AMOUNT_8
+
 //Initial Mint Account
 const account1 = process.env.ACCOUNT_1
 const account2 = process.env.ACCOUNT_2
@@ -24,14 +34,12 @@ module.exports = async function (deployer) {
 // to test the complete deployment and update cycle, and then only one in mainnet,
 // since it is the one that will be carried out definitively
 
-// Testnet Approach Stage #3
+// Testnet Approach Stage #1
 const instance = await deployProxy(PaidTokenV3, [account1, account2, account3], { deployer });
-// const instance = await upgradeProxy(existing.address , PaidTokenV3, [account1, account2, account3] ,{ deployer });
 
 
-  // Mainnet Approach Stage #4
-  // const existing = await PaidTokenV2.deployed();
-  // const instance = await upgradeProxy(existing.address, PaidTokenV3,[account1, account2, account3] ,{ deployer });
+  // Mainnet Approach Stage #2
+  // const instance = await deployProxy(PaidTokenV3, [account1, account2, account3], { deployer });
 
   const wallets = [
     allocation1,
@@ -49,12 +57,12 @@ const instance = await deployProxy(PaidTokenV3, [account1, account2, account3], 
     await instance.addAllocations([wallets[i]], ['1000000000000000000000000'], i.toString());
   }
 
-  // await instance.addAllocations(['0x67F5B9e57EaE4f5f32E98BB7D7D1fb8F90AcFb45'], ['100000000000000000000000000'], '0'); // 30 Days 1.66 Percent
-  // await instance.addAllocations(['0x96c123033801BCBeFb5Bf6B17A5E7E71c1f17D97'], ['100000000000000000000000000'], '1'); // 180 Days 1.66 Percent
-  // await instance.addAllocations(['0x700c0293E3Ab1ac287bbB728373fe7D44963532d'], ['100000000000000000000000000'], '2'); // 360 Days 4.66 Percent
-  // await instance.addAllocations(['0x54a6a4E5AC96b4c12C9761214712829c15875621'], ['100000000000000000000000000'], '3'); // 30 Days 4.66 Percent
-  // await instance.addAllocations(['0x49a4A2B6f1E4eF243daD91aF28eF4c3C32eE9F24'], ['100000000000000000000000000'], '4'); // 0 Days 100 Percent
-  // await instance.addAllocations(['0x796c455Fdfd1C58C7DfE13D30BF2ad96f32Cc2a6'], ['100000000000000000000000000'], '5'); // 30 Days 11.11 Percent
-  // await instance.addAllocations(['0x2979c00883DC0E79aa3c465E909f6f6794408351'], ['100000000000000000000000000'], '6'); // 0 Days 10 initial 15 monthly Percent
-  // await instance.addAllocations(['0xfD848ecA5480F6A3549F437Ac9c441B440bAAdA4'], ['50000000000000000000000000'], '7'); // 0 Days 25 initial 25 monthly Percent
+  // await instance.addAllocations(['allocation1'], ['amount1'], '0'); // 30 Days 1.66 Percent
+  // await instance.addAllocations(['allocation2'], ['amount2'], '1'); // 180 Days 1.66 Percent
+  // await instance.addAllocations(['allocation3'], ['amount3'], '2'); // 360 Days 4.66 Percent
+  // await instance.addAllocations(['allocation4'], ['amount4'], '3'); // 30 Days 4.66 Percent
+  // await instance.addAllocations(['allocation5'], ['amount5'], '4'); // 0 Days 100 Percent
+  // await instance.addAllocations(['allocation6'], ['amount6'], '5'); // 30 Days 11.11 Percent
+  // await instance.addAllocations(['allocation7'], ['amount7'], '6'); // 0 Days 10 initial 15 monthly Percent
+  // await instance.addAllocations(['allocation8'], ['amount8'], '7'); // 0 Days 25 initial 25 monthly Percent
 };
