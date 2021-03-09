@@ -36,6 +36,7 @@ module.exports = async function (deployer) {
 
 // Testnet Approach Stage #1
 const instance = await deployProxy(PaidTokenV3, [], { deployer });
+await instance.pause(true);
 
 
   // Mainnet Approach Stage #2
