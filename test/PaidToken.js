@@ -1,4 +1,5 @@
-const PaidToken = artifacts.require("PaidTokenV2");
+const PaidToken = artifacts.require("PaidTokenV3");
+require('dotenv').config();
 
 const releaseTime = 1611588600000;
 const oneDay = 86400000;
@@ -31,8 +32,22 @@ before(async () => {
 });
 
 contract("PaidToken", accounts => {
-    const wallets = [accounts[3], accounts[4], accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
-    const totalAmounts = ['1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000'];
+    /* const wallets = [accounts[3], accounts[4], accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
+    const totalAmounts = ['1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000']; */
+    const wallets = [
+        process.env.ALLOCATION_2, 
+        process.env.ALLOCATION_3, 
+        process.env.ALLOCATION_5, 
+        process.env.ALLOCATION_6, 
+        process.env.ALLOCATION_7
+    ];
+    const totalAmounts = [
+        process.env.AMOUNT_2,
+        process.env.AMOUNT_3,
+        process.env.AMOUNT_5, 
+        process.env.AMOUNT_6,
+        process.env.AMOUNT_7
+    ];
     // it('upgrade', async () => {
     //   const paidToken = await deployProxy(PaidToken);
     //   assert.equal(await paidToken.getReleaseTime(), 1611588600, "not same")
@@ -79,33 +94,37 @@ contract("PaidToken", accounts => {
     //     }
     // });
 
-    it("should put 1000000000000000000000000 token account 0", () => {
-        return PaidToken.deployed()
-            .then(async instance => instance.balanceOf.call(accounts[3]))
-            .then((balance) => {
-                assert.equal(balance.toString(), '1000000000000000000000000', "test problem");
-            });
-    });
-
-    it("shouldn't send token", async () => {
+    /* it("should put "+totalAmounts[0]+" token account 0", async () => {
         const instance = await PaidToken.deployed();
+        const wallet = wallets[0]
+        const amount = totalAmounts[0]
 
-        await instance.approve(accounts[0], '1000000000000000000000000', {from: accounts[3]})
+        await instance.approve(wallet, amount, {from: process.env.FROM});
+        console.log(wallets[0]);
+        const balance = await instance.balanceOf.call(wallets[0]);
+        assert.equal(balance.toString(), totalAmounts[0], "test problem");
+    }); */
+
+    /* it("shouldn't send token", async () => {
+        console.log(accounts);
+        const instance = await PaidToken.deployed();
+        await instance.approve(accounts[6], totalAmounts[0], {from: wallets[0]})
+        instance.pause(false);
 
         try {
-            await instance.transferFrom(accounts[3], accounts[4], '1000000000000000000000000', {from: accounts[0]});
+            await instance.transferFrom(wallets[0], accounts[7], totalAmounts[0], {from: accounts[6]});
         } catch (err) {
             assert.equal(err.reason, 'Wait for vesting day!');
         }
 
         try {
-            await instance.transfer(accounts[3], '1000000000000000000000000', {from: accounts[0]});
+            await instance.transfer(wallets[0], totalAmounts[0], {from: accounts[6]});
         } catch (err) {
             assert.equal(err.reason, 'Wait for vesting day!');
         }
-    });
+    }); */
 
-    it("should put 1000000000000000000000000 token account 1", () => {
+    /* it("should put 1000000000000000000000000 token account 1", () => {
         return PaidToken.deployed()
             .then(instance => instance.balanceOf.call(accounts[3]))
             .then((balance) => {
@@ -167,9 +186,9 @@ contract("PaidToken", accounts => {
             .then((months) => {
                 assert.equal(months.toNumber(), 1, "test problem");
             })
-    });
+    });*/
 
-    it("should increase 30 days", async () => {
+    /* it("should increase 30 days", async () => {
         await advanceBlockAtTime(releaseTime + 30 * oneDay);
 
         return PaidToken.deployed()
@@ -177,9 +196,9 @@ contract("PaidToken", accounts => {
             .then((months) => {
                 assert.equal(months.toNumber(), 2, "test problem");
             })
-    });
+    }); */
 
-    it("should increase 45 days", async () => {
+    /*it("should increase 45 days", async () => {
         await advanceBlockAtTime(releaseTime + 45 * oneDay);
 
         return PaidToken.deployed()
@@ -197,21 +216,32 @@ contract("PaidToken", accounts => {
             .then((months) => {
                 assert.equal(months.toNumber(), 3, "test problem");
             })
-    });
+    });*/
 
     it("transfer logs", async () => {
         const instance = await PaidToken.deployed();
         await advanceBlockAtTime(releaseTime + (2 * 30) * oneDay);
         const types = {
-            0: '30 Days 1.66 Percent',
-            1: '180 Days 1.66 Percent',
-            2: '360 Days 4.66 Percent',
-            3: '30 Days 4.66 Percent',
-            4: '0 Days 100 Percent',
-            5: '30 Days 11.11 Percent',
-            6: '0 Days 10 initial 15 monthly Percent',
-            7: '0 Days 25 initial 25 monthly Percent',
+            0: '30 Days to unblock & 1.66% for 60 months',
+            1: '180 Days to unblock & 1.66% for 60 months',
+            2: '360 Days to unblock & 1.66% for 60 months',
+            3: '0 Days 100 Percent',
+            4: '30 Days to unblock & 4.16% for 24 months',
+            5: '30 Days to unblock & 11.11% for 9 months',
+            6: '0 Days to unblock, get 10% initial & 15% for 6 months',
+            7: '0 Days to unblock, get 25% initial & 25% for 3 months'
         };
+
+        let amounts = {
+            0:0,
+            1:process.env.AMOUNT_2,
+            2:process.env.AMOUNT_3,
+            3:0,
+            4:process.env.AMOUNT_5,
+            5:process.env.AMOUNT_6,
+            6:process.env.AMOUNT_7,
+            7:0            
+        }
 
         for (let x = 3; x < 10; x ++) {
             let lastTransferableAmount = '';
@@ -225,12 +255,14 @@ contract("PaidToken", accounts => {
                 let canTransfer = await instance.canTransfer.call(accounts[x], transferable)
 
                 if (lastTransferableAmount !== transferable.toString()) {
-                    console.log(`${types[x]} ${x}. account`, new Date(day), new Date(timestamp.toNumber() * 1000), (i + 1) + '. month', (i * 30) + '. day', 'Transferable amount: ' + transferable.toString(), 'Rest: ' + rest, 'Can transfer: ' + canTransfer.toString());
+
+                    console.log(`${types[x]} ${x}. account`, new Date(day), new Date(timestamp.toNumber() * 1000), (i + 1) + '. month', (i * 30) + 
+                        '. day', 'Transferable amount: ' + transferable.toString(), 'Rest: ' + rest, 'Can transfer: ' + canTransfer.toString());
                     lastTransferableAmount = transferable.toString();
                 } else {
                     continue;
                 }
             }
         }
-    });
+    }); 
 });

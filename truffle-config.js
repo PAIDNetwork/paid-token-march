@@ -3,6 +3,7 @@ require('dotenv').config();
 
 const mnemonic = process.env.MNEMONIC;
 const infuraKey = process.env.INFURA_KEY;
+const from = process.env.FROM;
 
 module.exports = {
   plugins: [
@@ -21,9 +22,9 @@ module.exports = {
     },
     development: {
       host: "127.0.0.1",     // Localhost (default: none)
-      port: 7545,            // Standard Ethereum port (default: none)
-      network_id: "5777",       // Any network (default: none),
-      from: '0x1191bcd21C66E37BC9d3a5545678717bDCa394EA'
+      port: 8545,            // Standard Ethereum port (default: none)
+      network_id: "4",       // Any network (default: none),
+      from: from
     },
     rinkeby: {
       provider: () => new HDWalletProvider(mnemonic, infuraKey, 0),
