@@ -33,16 +33,16 @@ module.exports = {
       timeoutBlocks: 5000000,  // # of blocks before a deployment times out  (minimum/default: 50)
       skipDryRun: true,     // Skip dry run before migrations? (default: false for public nets )
       confirmations: 2    // # of confs to wait between deployments. (default: 0)
-    	},
-		mainnet: {
-			provider: () => new HDWalletProvider(mnemonic, infuraKey, 0),
-			network_id: 1,
-			gas: 2500000,
-			gasPrice: 150e9,
-			// confirmations: 2    // # of confs to wait between deployments. (default: 0)
-			// timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
-			// skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
-		},
+    },
+     mainnet: {
+      provider: () => new HDWalletProvider(mnemonic, infuraKey, 0),
+      network_id: 1,
+      gas: 2500000,
+      gasPrice: 150e9,
+      // confirmations: 2    // # of confs to wait between deployments. (default: 0)
+      // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
+      // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
+    },
   //  development: {
   //    host: "127.0.0.1",
   //    port: 7545,
