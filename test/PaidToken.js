@@ -1,4 +1,7 @@
 const PaidToken = artifacts.require("PaidTokenV3");
+const csv = require('csv-parser');
+const createCsvWriter = require('csv-writer').createObjectCsvWriter;
+const fs = require('fs');
 require('dotenv').config();
 
 const releaseTime = 1611588600000;
@@ -32,22 +35,29 @@ before(async () => {
 });
 
 contract("PaidToken", accounts => {
-    /* const wallets = [accounts[3], accounts[4], accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
-    const totalAmounts = ['1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000']; */
     const wallets = [
-        process.env.ALLOCATION_2, 
-        process.env.ALLOCATION_3, 
-        process.env.ALLOCATION_5, 
-        process.env.ALLOCATION_6, 
-        process.env.ALLOCATION_7
+        accounts[8],
+        accounts[9],
+        accounts[10], 
+        accounts[3],
+        accounts[4], 
+        accounts[5], 
+        accounts[6],
+        accounts[7]
     ];
     const totalAmounts = [
+        process.env.AMOUNT_0,
+        process.env.AMOUNT_1,
         process.env.AMOUNT_2,
         process.env.AMOUNT_3,
+        process.env.AMOUNT_4,
         process.env.AMOUNT_5, 
         process.env.AMOUNT_6,
         process.env.AMOUNT_7
     ];
+    /* const wallets = [accounts[3], accounts[4], accounts[5], accounts[6], accounts[7], accounts[8], accounts[9]];
+    const totalAmounts = ['1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000', '1000000000000000000000000']; */
+
     // it('upgrade', async () => {
     //   const paidToken = await deployProxy(PaidToken);
     //   assert.equal(await paidToken.getReleaseTime(), 1611588600, "not same")
@@ -219,50 +229,78 @@ contract("PaidToken", accounts => {
     });*/
 
     it("transfer logs", async () => {
+
         const instance = await PaidToken.deployed();
         await advanceBlockAtTime(releaseTime + (2 * 30) * oneDay);
+
+        await instance.pause(false)
+        await instance.addAllocations([wallets[0]], [totalAmounts[0]], 0, {from: process.env.FROM});
+        await instance.addAllocations([wallets[1]], [totalAmounts[1]], 1, {from: process.env.FROM});
+        await instance.addAllocations([wallets[2]], [totalAmounts[2]], 2, {from: process.env.FROM});
+        await instance.addAllocations([wallets[3]], [totalAmounts[3]], 3, {from: process.env.FROM});
+        await instance.addAllocations([wallets[4]], [totalAmounts[4]], 4, {from: process.env.FROM});
+        await instance.addAllocations([wallets[5]], [totalAmounts[5]], 5, {from: process.env.FROM});
+        await instance.addAllocations([wallets[6]], [totalAmounts[6]], 6, {from: process.env.FROM});
+        await instance.addAllocations([wallets[7]], [totalAmounts[7]], 7, {from: process.env.FROM});
+
         const types = {
             0: '30 Days to unblock & 1.66% for 60 months',
             1: '180 Days to unblock & 1.66% for 60 months',
-            2: '360 Days to unblock & 1.66% for 60 months',
-            3: '0 Days 100 Percent',
-            4: '30 Days to unblock & 4.16% for 24 months',
+            2: '360 Days to unblock & 4.16% for 24 months',
+            3: '30 Days to unblock & 4.16% for 24 months',
+            4: '0 Days 100 Percent',
             5: '30 Days to unblock & 11.11% for 9 months',
             6: '0 Days to unblock, get 10% initial & 15% for 6 months',
             7: '0 Days to unblock, get 25% initial & 25% for 3 months'
         };
 
-        let amounts = {
-            0:0,
-            1:process.env.AMOUNT_2,
-            2:process.env.AMOUNT_3,
-            3:0,
-            4:process.env.AMOUNT_5,
-            5:process.env.AMOUNT_6,
-            6:process.env.AMOUNT_7,
-            7:0            
-        }
+        const data = [];
 
-        for (let x = 3; x < 10; x ++) {
+        const csvWriter = createCsvWriter({
+            path: 'vestings.csv',
+            header: [
+            {id: 'Vesting_type', title: 'Vesting Type'},
+            {id: 'Vesting_Description', title: 'Vesting Description'},
+            {id: 'Date1', title: 'Date 1'},
+            {id: 'Date2', title: 'Date 2'},
+            {id: 'Transferable_amount', title: 'Transferable amount'},
+            {id: 'Rest', title: 'Rest'}]
+        });
+
+        for (let x = 0; x < 8; x ++) {
             let lastTransferableAmount = '';
-            for (let i = 0; i < 70; i ++) {
-                const day = 1613347200000 + (i * 30) * _oneDay;
-                await advanceBlockAtTime(releaseTime + (i * 30) * oneDay);
+            if(wallets[x] != 0){
+                for (let i = 0; i < 30; i ++) {
+                    const day = 1611588600000 + (i * 30) * _oneDay;
+                    await advanceBlockAtTime(releaseTime + (i * 30) * oneDay);
 
-                let timestamp = await instance.getTimestamp.call()
-                let transferable = await instance.getTransferableAmount.call(accounts[x])
-                let rest = await instance.getRestAmount.call(accounts[x])
-                let canTransfer = await instance.canTransfer.call(accounts[x], transferable)
+                    let timestamp = await instance.getTimestamp.call()
+                    let transferable = await instance.getTransferableAmount.call(wallets[x])
+                    let rest = await instance.getRestAmount.call(wallets[x])
+                    let canTransfer = await instance.canTransfer.call(wallets[x], transferable)
 
-                if (lastTransferableAmount !== transferable.toString()) {
-
-                    console.log(`${types[x]} ${x}. account`, new Date(day), new Date(timestamp.toNumber() * 1000), (i + 1) + '. month', (i * 30) + 
-                        '. day', 'Transferable amount: ' + transferable.toString(), 'Rest: ' + rest, 'Can transfer: ' + canTransfer.toString());
-                    lastTransferableAmount = transferable.toString();
-                } else {
-                    continue;
+                    if (lastTransferableAmount !== transferable.toString()) {
+                        
+                        data.push(
+                            {
+                                Vesting_type: `Vesting ${x}`,
+                                Vesting_Description: types[x],
+                                Date1: new Date(day),
+                                Date2: new Date(timestamp.toNumber() * 1000),
+                                Transferable_amount: transferable.toString() / 1000000000000000000,
+                                Rest: rest / 1000000000000000000
+                            });
+                        console.log(`Vesting ${x}`, new Date(day), new Date(timestamp.toNumber() * 1000), (i + 1) + '. month', (i * 30) + 
+                            '. day', 'Transferable amount: ' + transferable.toString(), 'Rest: ' + rest/* , 'Can transfer: ' + canTransfer.toString() */);
+                        lastTransferableAmount = transferable.toString();
+                    } else {
+                        continue;
+                    }
                 }
             }
         }
+        csvWriter
+            .writeRecords(data)
+            .then(()=> console.log('The CSV file was written successfully'));
     }); 
 });
