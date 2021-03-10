@@ -3,6 +3,8 @@ require('dotenv').config();
 
 const mnemonic = process.env.MNEMONIC;
 const infuraKey = process.env.INFURA_KEY;
+const infuraKeyRopsten = process.env.ROPSTEN_KEY;
+const infuraKeyKovan = process.env.KOVAN_KEY;
 const from = process.env.FROM;
 
 module.exports = {
@@ -29,6 +31,24 @@ module.exports = {
     rinkeby: {
       provider: () => new HDWalletProvider(mnemonic, infuraKey, 0),
       network_id: 4,
+      gas: 8000000,
+      gasPrice: 18000000000,
+      timeoutBlocks: 5000000,  // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true,     // Skip dry run before migrations? (default: false for public nets )
+      confirmations: 2    // # of confs to wait between deployments. (default: 0)
+    },
+    ropsten: {
+      provider: () => new HDWalletProvider(mnemonic, infuraKeyRopsten, 0),
+      network_id: 3,
+      gas: 8000000,
+      gasPrice: 18000000000,
+      timeoutBlocks: 5000000,  // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true,     // Skip dry run before migrations? (default: false for public nets )
+      confirmations: 2    // # of confs to wait between deployments. (default: 0)
+    },
+    kovan: {
+      provider: () => new HDWalletProvider(mnemonic, infuraKeyKovan, 0),
+      network_id: 42,
       gas: 8000000,
       gasPrice: 18000000000,
       timeoutBlocks: 5000000,  // # of blocks before a deployment times out  (minimum/default: 50)
