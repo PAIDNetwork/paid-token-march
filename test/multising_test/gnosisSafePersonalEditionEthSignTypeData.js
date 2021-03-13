@@ -1,15 +1,12 @@
 const utils = require('./utils/general')
 const safeUtils = require('./utils/execution')
 
-
-
-
 contract('GnosisSafe using eth_signTypedData', function(accounts) {
 
-    let gnosisSafe 
+    let gnosisSafe
     let executor = accounts[8]
 
-	const GnosisSafe = = await ethers.contract.attach('0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F')
+	const GnosisSafe = await ethers.contract.attach('0x34CfAC646f301356fAa8B21e94227e3583Fe3F5F')
 	const ProxyFactory = await ethers.contract.attach('0xd89F3cEE8C212958f49951BAE738DD8B68429E4D')
 
     const CALL = 0
