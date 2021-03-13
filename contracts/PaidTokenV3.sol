@@ -69,6 +69,8 @@ contract PaidTokenV3 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
         for(uint i = 0; i < addressesLength; i++) {
             address _address = addresses[i];
             uint256 totalAmount = totalAmounts[i];
+                                            // 100 total
+                                            // 90 locked 10 unlocked
             uint256 monthlyAmount = mulDiv(totalAmounts[i], vestingType.monthlyRate, 100000000000000000000);
             uint256 initialAmount = mulDiv(totalAmounts[i], vestingType.initialRate, 100000000000000000000);
             uint256 afterDay = vestingType.afterDays;
