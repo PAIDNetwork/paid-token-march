@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity >=0.6.2 <0.8.0;
+pragma solidity ^0.8.0;
 
-import "../../introspection/IERC165Upgradeable.sol";
+import "../../utils/introspection/IERC165Upgradeable.sol";
 
 /**
  * @dev Required interface of an ERC721 compliant contract.
@@ -117,8 +117,8 @@ interface IERC721Upgradeable is IERC165Upgradeable {
       *
       * Requirements:
       *
-     * - `from` cannot be the zero address.
-     * - `to` cannot be the zero address.
+      * - `from` cannot be the zero address.
+      * - `to` cannot be the zero address.
       * - `tokenId` token must exist and be owned by `from`.
       * - If the caller is not `from`, it must be approved to move this token by either {approve} or {setApprovalForAll}.
       * - If `to` refers to a smart contract, it must implement {IERC721Receiver-onERC721Received}, which is called upon a safe transfer.
