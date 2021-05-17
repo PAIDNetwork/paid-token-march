@@ -16,9 +16,6 @@ module.exports = {
   // for more details on how to specify configuration options!
   //
   networks: {
-    advenced: {
-      from: '',
-    },
     development: {
       host: "127.0.0.1",     // Localhost (default: none)
       port: 8545,            // Standard Ethereum port (default: none)
@@ -43,16 +40,24 @@ module.exports = {
       // timeoutBlocks: 200,  // # of blocks before a deployment times out  (minimum/default: 50)
       // skipDryRun: true     // Skip dry run before migrations? (default: false for public nets )
     },
-  //  development: {
-  //    host: "127.0.0.1",
-  //    port: 7545,
-  //    network_id: "*"
-  //  },
-  //  test: {
-  //    host: "127.0.0.1",
-  //    port: 7545,
-  //    network_id: "*"
-  //  }
+		testnet: {
+      provider: () => new HDWalletProvider(mnemonic, process.env.URL_TESTNET_BSC),
+      network_id: 97,
+			gas: 2500000,
+      gasPrice: 60e9,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    },
+    bsc: {
+      provider: () => new HDWalletProvider(mnemonic, process.env.URL_BSC),
+      network_id: 56,
+			gas: 2500000,
+      gasPrice: 135e9,
+      confirmations: 10,
+      timeoutBlocks: 200,
+      skipDryRun: true
+    }
   },
   //
   // Configure your compilers
