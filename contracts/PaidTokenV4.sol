@@ -28,7 +28,7 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
     }
 
     function getMaxTotalSupply() public pure returns (uint256) {
-        return 594717455710000000000000000;
+        return 200000000000000000000000000;
     }
 
     function _mint(address account, uint256 amount) internal override {
