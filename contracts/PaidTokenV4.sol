@@ -1,10 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.12;
-pragma experimental ABIEncoderV2;
+//Update Solidity version and change to abicoder v2 require by zokyo
 
-import "../lib/@openzeppelin/contracts-upgradeable/token/ERC20/ERC20PausableUpgradeable.sol";
-import "../lib/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "../lib/@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
+pragma solidity >= 0.7.4;
+pragma abicoder v2;
+
+import "@openzeppelin/contracts-upgradeable/token/ERC20/ERC20PausableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import "@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/math/Math.sol";
 
 struct FrozenWallet {
     address wallet;
@@ -47,21 +51,44 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
         vestingTypes.push(VestingType(25000000000000000000, 25000000000000000000, 0, 1, true)); // 0 Days 25 initial 25 monthly Percent
     }
 
-    function getReleaseTime() public pure returns (uint256) {
-        return 1611588600; // "Mon, 25 Jan 2021 15:30:00 GMT"
-    }
+    //Gas optimization, replacing functions with constant variables
 
-    function getMaxTotalSupply() public pure returns (uint256) {
-        return 594717455710000000000000000;
+    
+    uint private constant _getMaxTotalSupply = 594717455710000000000000000;
+    uint private constant _getReleaseTime = 1611588600;
+
+    // Required by zokyo paused by blocks
+    uint256 public pausedBeforeBlockNumber;
+    bool public pausedBeforeBlockNumberDisabled;
+
+    event PausedByBlock(
+        uint256 indexed blocks,
+        uint256 timestamp,
+        uint256 total
+    );
+
+    function getReleaseTime() public returns (uint256) {
+        return _getReleaseTime; // "Mon, 25 Jan 2021 15:30:00 GMT"
+    }
+    
+    function getMaxTotalSupply() public returns (uint256) {
+        return _getMaxTotalSupply;
     }
 
     function mulDiv(uint x, uint y, uint z) public pure returns (uint) {
-        return x.mul(y).div(z);
+        return x * y / z;
+    //  return x.mul(y).div(z);
     }
 
     function addAllocations(address[] memory addresses, uint[] memory totalAmounts, uint vestingTypeIndex) external payable onlyOwner returns (bool) {
         require(addresses.length == totalAmounts.length, "Address and totalAmounts length must be same");
-        require(vestingTypes[vestingTypeIndex].vesting, "Vesting type isn't found");
+        
+        //Wrong requirement, change to "invalid opcode"
+        require(vestingTypes[vestingTypeIndex].vesting, "invalid opcode");
+
+     //Additional checks required by zokyo, address != 0, and totalAmount != 0 
+        require(address(0) = false); //"ERC20: transfer to the zero address");
+        require(totalAmounts.value > 0);
 
         VestingType memory vestingType = vestingTypes[vestingTypeIndex];
         uint addressesLength = addresses.length;
@@ -82,7 +109,9 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
 
     function _mint(address account, uint256 amount) internal override {
         uint totalSupply = super.totalSupply();
-        require(getMaxTotalSupply() >= totalSupply.add(amount), "Max total supply over");
+        
+    //Unnecesary requirement, Zokyo ask for remove this require
+        //require(getMaxTotalSupply() >= totalSupply.add(amount), "Max total supply over");
 
         super._mint(account, amount);
     }
@@ -149,7 +178,8 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
 
         return transferableAmount;
     }
-
+//Mapping this to test
+    mapping (address => uint256) internal _balances;
 
     function transferMany(address[] calldata recipients, uint256[] calldata amounts)
     external
@@ -166,6 +196,7 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
         for (uint256 i = 0; i < recipients.length; i++) {
             address recipient = recipients[i];
             uint256 amount = amounts[i];
+
             require(recipient != address(0), "ERC20: transfer to the zero address");
 
             _balances[recipient] = _balances[recipient].add(amount);
@@ -219,12 +250,45 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
     function pause(bool status) public onlyOwner {
         if (status) {
             _pause();
-        } else {
+        } 
+        else {
             _unpause();
         }
+    }
+// All this is for meet zokyo requirements
+    function isPausedDisabled() public view returns (bool) {
+        if (_msgSender() == owner()) {
+            // owner always can transfer
+            return false;
+        }
+        return (!pausedBeforeBlockNumberDisabled &&
+            (block.number < pausedBeforeBlockNumber));
+    }
+
+    /**
+     * @dev Paused by Block - Block any transfer and burn any tokens
+     * @dev Setting the number of blocks that disable the Transfer methods
+     * @param blocksDuration number of block that transfer are disabled
+     */
+    function pausedByBlock(uint256 blocksDuration) public onlyOwner {
+        require(
+            !pausedBeforeBlockNumberDisabled,
+            "Paused by Block is disabled"
+        );
+        pausedBeforeBlockNumber = block.number + blocksDuration;
+        emit PausedByBlock(
+            blocksDuration,
+            block.number,
+            pausedBeforeBlockNumber
+        );
+    }
+
+    function disablePausedByBlockNumber() public onlyOwner {
+        pausedBeforeBlockNumber = 0;
+        pausedBeforeBlockNumberDisabled = true;
     }
 
     function burn(uint256 amount) external onlyOwner {
         _burn(msg.sender, amount);
     }
-}
+    }
