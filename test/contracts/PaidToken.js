@@ -1,4 +1,4 @@
-const PaidToken = artifacts.require("PaidTokenV2");
+const PaidToken = artifacts.require("PaidTokenV4");
 
 const releaseTime = 1611588600000;
 const oneDay = 86400000;
