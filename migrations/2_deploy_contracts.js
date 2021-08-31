@@ -29,7 +29,7 @@ const account1 = process.env.ACCOUNT_1
 const account2 = process.env.ACCOUNT_2
 const account3 = process.env.ACCOUNT_3
 
-module.exports = async function (deployer) {
+module.exports = async function (deployer, network) {
 // @TODO: The three types of migrations to be carried out are placed, two in testnet,
 // to test the complete deployment and update cycle, and then only one in mainnet,
 // since it is the one that will be carried out definitively
