@@ -191,7 +191,7 @@ contract PaidTokenV4ETH is Initializable, OwnableUpgradeable, ERC20PausableUpgra
     function _beforeTokenTransfer(address sender, address recipient, uint256 amount) internal virtual override {
         require(canTransfer(sender, amount), "Wait for vesting day!");
         super._beforeTokenTransfer(sender, recipient, amount);
-        require(isPausedUntilBlock(), 'Contract is paused right now');
+        require(!isPausedUntilBlock(), 'Contract is paused right now');
     }
 
     function withdraw(uint amount) public onlyOwner {
