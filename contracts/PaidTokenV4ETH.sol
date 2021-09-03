@@ -211,12 +211,20 @@ contract PaidTokenV4ETH is Initializable, OwnableUpgradeable, ERC20PausableUpgra
     }
 
     /**
-     * @dev Paused by Block - Block any transfer and burn any tokens
-     * @dev Setting the number of blocks that disable the Transfer methods
-     * @param blocksDuration number of block that transfer are disabled
+     * @dev Pauses the contract for up to one week.
+     * (40320 blocks = around 1 week, if every 15s block gets added.)
      */
-    function pausedUntilBlock(uint256 blocksDuration) public onlyOwner {
-        pausedBeforeBlockNumber = block.number.add(blocksDuration);
+    function pause() public onlyOwner {
+        pausedBeforeBlockNumber = block.number.add(40320);
+        emit PausedUntilBlock(pausedBeforeBlockNumber);
+    }
+
+    /**
+     * @dev Disengages the pause activated by the `pause()` function.
+     * the contract will start working again.
+     */
+    function unpause() public onlyOwner {
+        pausedBeforeBlockNumber = 0;
         emit PausedUntilBlock(pausedBeforeBlockNumber);
     }
 
