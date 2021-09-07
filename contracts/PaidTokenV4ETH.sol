@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.12;
-pragma experimental ABIEncoderV2;
+pragma solidity 0.7.6;
 
+import "../lib/@openzeppelin/contracts-upgradeable/token/ERC20/SafeERC20Upgradeable.sol";
 import "../lib/@openzeppelin/contracts-upgradeable/token/ERC20/ERC20PausableUpgradeable.sol";
 import "../lib/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../lib/@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
+import '../lib/@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol';
 
 struct FrozenWallet {
     address wallet;
@@ -25,9 +26,16 @@ struct VestingType {
     bool vesting;
 }
 
-contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradeable {
+contract PaidTokenV4ETH is Initializable, OwnableUpgradeable, ERC20PausableUpgradeable {
+    using SafeMathUpgradeable for uint256;
+
+    uint256 constant maxTotalSupply = 594717455710000000000000000;
+    uint256 constant releaseTime = 1611588600;
+
     mapping (address => FrozenWallet) public frozenWallets;
     VestingType[] public vestingTypes;
+
+    uint256 public pausedBeforeBlockNumber;
 
     function initialize() initializer public {
         __Ownable_init();
@@ -35,7 +43,7 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
         __ERC20Pausable_init();
 
 	// Mint All TotalSuply in the Account OwnerShip
-        _mint(owner(), getMaxTotalSupply());
+        _mint(owner(), maxTotalSupply);
 
         vestingTypes.push(VestingType(1660000000000000000, 0, 30 days, 0, true)); // 30 Days 1.66 Percent
         vestingTypes.push(VestingType(1660000000000000000, 0, 180 days, 0, true)); // 180 Days 1.66 Percent
@@ -47,13 +55,9 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
         vestingTypes.push(VestingType(25000000000000000000, 25000000000000000000, 0, 1, true)); // 0 Days 25 initial 25 monthly Percent
     }
 
-    function getReleaseTime() public pure returns (uint256) {
-        return 1611588600; // "Mon, 25 Jan 2021 15:30:00 GMT"
-    }
-
-    function getMaxTotalSupply() public pure returns (uint256) {
-        return 594717455710000000000000000;
-    }
+    event PausedUntilBlock(
+        uint256 total
+    );
 
     function mulDiv(uint x, uint y, uint z) public pure returns (uint) {
         return x.mul(y).div(z);
@@ -61,7 +65,7 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
 
     function addAllocations(address[] memory addresses, uint[] memory totalAmounts, uint vestingTypeIndex) external payable onlyOwner returns (bool) {
         require(addresses.length == totalAmounts.length, "Address and totalAmounts length must be same");
-        require(vestingTypes[vestingTypeIndex].vesting, "Vesting type isn't found");
+        require(vestingTypes[vestingTypeIndex].vesting, "invalid opcode");
 
         VestingType memory vestingType = vestingTypes[vestingTypeIndex];
         uint addressesLength = addresses.length;
@@ -74,22 +78,17 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
             uint256 afterDay = vestingType.afterDays;
             uint256 monthDelay = vestingType.monthDelay;
 
+            //Additional checks required by zokyo, address != 0, and totalAmount != 0 
+            require(_address != address(0), "Should not transfer to the zero address");
+            require(totalAmount > 0, "Should be greater than 0");
+
             addFrozenWallet(_address, totalAmount, monthlyAmount, initialAmount, afterDay, monthDelay);
         }
 
         return true;
     }
 
-    function _mint(address account, uint256 amount) internal override {
-        uint totalSupply = super.totalSupply();
-        require(getMaxTotalSupply() >= totalSupply.add(amount), "Max total supply over");
-
-        super._mint(account, amount);
-    }
-
     function addFrozenWallet(address wallet, uint totalAmount, uint monthlyAmount, uint initialAmount, uint afterDays, uint monthDelay) internal {
-        uint256 releaseTime = getReleaseTime();
-
         if (!frozenWallets[wallet].scheduled) {
             super._transfer(msg.sender, wallet, totalAmount);
         }
@@ -115,7 +114,6 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
     }
 
     function getMonths(uint afterDays, uint monthDelay) public view returns (uint) {
-        uint256 releaseTime = getReleaseTime();
         uint time = releaseTime.add(afterDays);
 
         if (block.timestamp < time) {
@@ -129,8 +127,6 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
     }
 
     function isStarted(uint startDay) public view returns (bool) {
-        uint256 releaseTime = getReleaseTime();
-
         if (block.timestamp < releaseTime || block.timestamp < startDay) {
             return false;
         }
@@ -150,26 +146,15 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
         return transferableAmount;
     }
 
-
     function transferMany(address[] calldata recipients, uint256[] calldata amounts)
     external
 	onlyOwner {
         require(recipients.length == amounts.length, "PAID Token: Wrong array length");
-
-        uint256 total = 0;
-        for (uint256 i = 0; i < amounts.length; i++) {
-            total = total.add(amounts[i]);
-        }
-
-	_balances[msg.sender] = _balances[msg.sender].sub(total, "ERC20: transfer amount exceeds balance");
-
         for (uint256 i = 0; i < recipients.length; i++) {
             address recipient = recipients[i];
             uint256 amount = amounts[i];
-            require(recipient != address(0), "ERC20: transfer to the zero address");
 
-            _balances[recipient] = _balances[recipient].add(amount);
-            emit Transfer(msg.sender, recipient, amount);
+            SafeERC20Upgradeable.safeTransfer(this, recipient, amount);
         }
     }
 
@@ -206,6 +191,7 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
     function _beforeTokenTransfer(address sender, address recipient, uint256 amount) internal virtual override {
         require(canTransfer(sender, amount), "Wait for vesting day!");
         super._beforeTokenTransfer(sender, recipient, amount);
+        require(!isPausedUntilBlock(), 'Contract is paused right now');
     }
 
     function withdraw(uint amount) public onlyOwner {
@@ -216,12 +202,30 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
         require(success, "Address: unable to send value, recipient may have reverted");
     }
 
-    function pause(bool status) public onlyOwner {
-        if (status) {
-            _pause();
-        } else {
-            _unpause();
+    function isPausedUntilBlock() public view returns (bool) {
+        if (_msgSender() == owner()) {
+            // owner always can transfer
+            return false;
         }
+        return (block.number < pausedBeforeBlockNumber);
+    }
+
+    /**
+     * @dev Pauses the contract for up to one week.
+     * (40320 blocks = around 1 week, if every 15s block gets added.)
+     */
+    function pause() public onlyOwner {
+        pausedBeforeBlockNumber = block.number.add(40320);
+        emit PausedUntilBlock(pausedBeforeBlockNumber);
+    }
+
+    /**
+     * @dev Disengages the pause activated by the `pause()` function.
+     * the contract will start working again.
+     */
+    function unpause() public onlyOwner {
+        pausedBeforeBlockNumber = 0;
+        emit PausedUntilBlock(pausedBeforeBlockNumber);
     }
 
     function burn(uint256 amount) external onlyOwner {

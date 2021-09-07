@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.6.12;
+pragma solidity 0.7.6;
 pragma experimental ABIEncoderV2;
 
 import "../lib/@openzeppelin/contracts-upgradeable/token/ERC20/ERC20PausableUpgradeable.sol";
 import "../lib/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "../lib/@openzeppelin/contracts-upgradeable/proxy/Initializable.sol";
+import '../lib/@openzeppelin/contracts-upgradeable/math/SafeMathUpgradeable.sol';
 
 struct FrozenWallet {
     address wallet;
@@ -26,6 +27,8 @@ struct VestingType {
 }
 
 contract PaidTokenV3 is Initializable, OwnableUpgradeable, ERC20PausableUpgradeable {
+    using SafeMathUpgradeable for uint256;
+
     mapping (address => FrozenWallet) public frozenWallets;
     VestingType[] public vestingTypes;
 
