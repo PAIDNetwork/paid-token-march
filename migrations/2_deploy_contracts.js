@@ -1,9 +1,9 @@
-const { deployProxy, upgradeProxy } = require('@openzeppelin/truffle-upgrades');
-require('dotenv').config();
+const { deployProxy, upgradeProxy } = require('@openzeppelin/truffle-upgrades')
+require('dotenv').config()
 // handle migrations
 // const PaidToken = artifacts.require("PaidToken");
 // const PaidTokenV2 = artifacts.require("PaidTokenV2");
-const PaidTokenV3 = artifacts.require("PaidTokenV3");
+const PaidTokenV4 = artifacts.require('PaidTokenV4')
 
 //Allocation Accounts
 const allocation1 = process.env.ALLOCATION_1
@@ -29,15 +29,15 @@ const account1 = process.env.ACCOUNT_1
 const account2 = process.env.ACCOUNT_2
 const account3 = process.env.ACCOUNT_3
 
-module.exports = async function (deployer) {
-// @TODO: The three types of migrations to be carried out are placed, two in testnet,
-// to test the complete deployment and update cycle, and then only one in mainnet,
-// since it is the one that will be carried out definitively
+module.exports = async function(deployer) {
+  // @TODO: The three types of migrations to be carried out are placed, two in testnet,
+  // to test the complete deployment and update cycle, and then only one in mainnet,
+  // since it is the one that will be carried out definitively
 
-// Testnet Approach Stage #1
-const instance = await deployProxy(PaidTokenV3, [], { deployer });
-await instance.pause(true);
+  // Testnet Approach Stage #1
+  const instance = await deployProxy(PaidTokenV4, [], { deployer })
 
+  // await instance.pause(true)
 
   // Mainnet Approach Stage #2
   // const instance = await deployProxy(PaidTokenV3, [account1, account2, account3], { deployer });
@@ -54,7 +54,7 @@ await instance.pause(true);
   // ]
 
   // for (const i in wallets) {
-	// 	console.log(wallets[i]);
+  // 	console.log(wallets[i]);
   //   await instance.addAllocations([wallets[i]], ['1000000000000000000000000'], i.toString());
   // }
 
@@ -66,4 +66,4 @@ await instance.pause(true);
   // await instance.addAllocations(['allocation6'], ['amount6'], '5'); // 30 Days 11.11 Percent
   // await instance.addAllocations(['allocation7'], ['amount7'], '6'); // 0 Days 10 initial 15 monthly Percent
   // await instance.addAllocations(['allocation8'], ['amount8'], '7'); // 0 Days 25 initial 25 monthly Percent
-};
+}

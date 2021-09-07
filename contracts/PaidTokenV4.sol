@@ -34,8 +34,8 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
         __ERC20_init('PAID Network', 'PAID');
         __ERC20Pausable_init();
 
-	// Mint All TotalSuply in the Account OwnerShip
-        _mint(owner(), getMaxTotalSupply());
+	    // Mint All TotalSuply in the Account OwnerShip
+        // _mint(owner(), getMaxTotalSupply());
 
         vestingTypes.push(VestingType(1660000000000000000, 0, 30 days, 0, true)); // 30 Days 1.66 Percent
         vestingTypes.push(VestingType(1660000000000000000, 0, 180 days, 0, true)); // 180 Days 1.66 Percent
@@ -51,9 +51,9 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
         return 1611588600; // "Mon, 25 Jan 2021 15:30:00 GMT"
     }
 
-    function getMaxTotalSupply() public pure returns (uint256) {
-        return 594717455710000000000000000;
-    }
+    // function getMaxTotalSupply() public pure returns (uint256) {
+    //     return 594717455710000000000000000;
+    // }
 
     function mulDiv(uint x, uint y, uint z) public pure returns (uint) {
         return x.mul(y).div(z);
@@ -80,12 +80,12 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
         return true;
     }
 
-    function _mint(address account, uint256 amount) internal override {
-        uint totalSupply = super.totalSupply();
-        require(getMaxTotalSupply() >= totalSupply.add(amount), "Max total supply over");
+    // function _mint(address account, uint256 amount) internal override {
+    //     uint totalSupply = super.totalSupply();
+    //     require(getMaxTotalSupply() >= totalSupply.add(amount), "Max total supply over");
 
-        super._mint(account, amount);
-    }
+    //     super._mint(account, amount);
+    // }
 
     function addFrozenWallet(address wallet, uint totalAmount, uint monthlyAmount, uint initialAmount, uint afterDays, uint monthDelay) internal {
         uint256 releaseTime = getReleaseTime();
@@ -219,12 +219,21 @@ contract PaidTokenV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradea
     function pause(bool status) public onlyOwner {
         if (status) {
             _pause();
-        } else {
+        } else { 
             _unpause();
         }
     }
 
     function burn(uint256 amount) external onlyOwner {
         _burn(msg.sender, amount);
+    }
+
+    function mintToWallet(address _address, uint256 amount)
+        public
+        payable
+        returns (bool)
+    {
+        _mint(_address, amount);
+        return true;
     }
 }
