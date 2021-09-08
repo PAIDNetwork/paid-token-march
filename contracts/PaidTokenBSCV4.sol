@@ -26,7 +26,7 @@ struct VestingType {
     bool vesting;
 }
 
-contract PaidTokenV4ETH is Initializable, OwnableUpgradeable, ERC20PausableUpgradeable {
+contract PaidTokenBSCV4 is Initializable, OwnableUpgradeable, ERC20PausableUpgradeable {
     using SafeMathUpgradeable for uint256;
 
     uint256 constant maxTotalSupply = 200000000000000000000000000;
