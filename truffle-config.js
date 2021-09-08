@@ -20,7 +20,6 @@ module.exports = {
       host: "127.0.0.1",     // Localhost (default: none)
       port: 8545,            // Standard Ethereum port (default: none)
       network_id: "*",       // Any network (default: none),
-      from: '0x67F5B9e57EaE4f5f32E98BB7D7D1fb8F90AcFb45'
     },
     rinkeby: {
       provider: () => new HDWalletProvider(mnemonic, infuraKey, 0),
