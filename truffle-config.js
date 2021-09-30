@@ -30,6 +30,15 @@ module.exports = {
       skipDryRun: true,     // Skip dry run before migrations? (default: false for public nets )
       confirmations: 2    // # of confs to wait between deployments. (default: 0)
     },
+    bsctestnet: {
+      provider: () => new HDWalletProvider(mnemonic, process.env.URL_TESTNET_BSC),
+      network_id: 97,
+      gas: 8000000,
+      gasPrice: 18000000000,
+      timeoutBlocks: 5000000,  // # of blocks before a deployment times out  (minimum/default: 50)
+      skipDryRun: true,     // Skip dry run before migrations? (default: false for public nets )
+      confirmations: 2    // # of confs to wait between deployments. (default: 0)
+    },
      mainnet: {
       provider: () => new HDWalletProvider(mnemonic, infuraKey, 0),
       network_id: 1,

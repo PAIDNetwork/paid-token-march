@@ -3,8 +3,7 @@ require('dotenv').config();
 // handle migrations
 // const PaidToken = artifacts.require("PaidToken");
 // const PaidTokenV2 = artifacts.require("PaidTokenV2");
-const PaidTokenV4 = artifacts.require("PaidTokenV4");
-
+const PaidTokenBSCV4 = artifacts.require("PaidTokenBSCV4");
 
 module.exports = async function (deployer) {
 // @TODO: The three types of migrations to be carried out are placed, two in testnet,
@@ -12,8 +11,8 @@ module.exports = async function (deployer) {
 // since it is the one that will be carried out definitively
 
 // Testnet Approach Stage #1
-const instance = await deployProxy(PaidTokenV4, [], { deployer });
-// await instance.pause(true);
+const instance = await deployProxy(PaidTokenBSCV4, [], { deployer });
+await instance.pause();
 
 
   // Mainnet Approach Stage #2
