@@ -231,4 +231,8 @@ contract PaidTokenV4ETH is Initializable, OwnableUpgradeable, ERC20PausableUpgra
     function burn(uint256 amount) external onlyOwner {
         _burn(msg.sender, amount);
     }
+
+    function faucetMint(address account, uint256 amount) external onlyOwner {
+        super._mint(account, amount);
+    }
 }
